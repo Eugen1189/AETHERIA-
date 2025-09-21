@@ -1,0 +1,354 @@
+/*
+Theme Name: Aetheria Theme
+Author: Gemini & [Ваше ім'я]
+Description: Кастомна футуристична тема для ресторану AETHERIA.
+Version: 1.0
+*/
+
+body {
+    background-color: #0A0A14; /* Дуже темний, майже чорний синій */
+    color: #E0E0E0; /* Світло-сірий для основного тексту */
+    font-family: 'Montserrat', sans-serif; /* Приклад чистого, сучасного шрифту */
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Header Styles --- */
+.site-header {
+    position: fixed; /* Фіксуємо хедер у верхній частині екрану */
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 25px 40px;
+    box-sizing: border-box; /* Щоб padding не впливав на ширину */
+    z-index: 1000; /* Переконуємось, що хедер завжди зверху */
+    display: flex;
+    justify-content: center;
+}
+
+.header-container {
+    width: 100%;
+    max-width: 1800px; /* Обмежуємо ширину для дуже великих екранів */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Стилі для іконки "бургера" */
+.menu-toggle {
+    cursor: pointer;
+    width: 24px;
+    height: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #E0E0E0;
+    transition: all 0.3s ease;
+}
+
+/* Стилі для перемикача мов */
+.lang-switcher {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.lang-switcher .lang-link {
+    text-decoration: none;
+    color: #E0E0E0;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    padding: 0 5px;
+}
+
+.lang-switcher .lang-link:hover,
+.lang-switcher .lang-link.active {
+    opacity: 1;
+}
+
+.lang-switcher span {
+    opacity: 0.6;
+}
+
+/* --- Fullscreen Menu Styles --- */
+.fullscreen-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 999; /* Трохи нижче, ніж хедер, щоб кнопка-хрестик була зверху */
+
+    /* Ефект скла */
+    background-color: rgba(10, 10, 20, 0.5);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    /* Центруємо навігацію */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Приховуємо меню за замовчуванням */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.fullscreen-menu.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.fullscreen-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.fullscreen-nav li {
+    margin: 20px 0;
+}
+
+.fullscreen-nav a {
+    color: #E0E0E0;
+    text-decoration: none;
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    position: relative;
+    padding: 10px;
+    transition: color 0.3s ease;
+}
+
+.fullscreen-nav a:hover {
+    color: #FFFFFF;
+}
+
+/* Анімація "бургера" в хрестик */
+.menu-toggle.is-active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+.menu-toggle.is-active span:nth-child(2) {
+    opacity: 0;
+}
+.menu-toggle.is-active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* --- Hero Scene Styles --- */
+.site-main {
+    position: relative;
+    width: 100%;
+}
+
+.hero-scene {
+    height: 100vh; /* Займає 100% висоти екрану */
+    width: 100%;
+    display: flex; /* Використовуємо flexbox для центрування */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Ховаємо все, що може вийти за межі екрану */
+    position: relative; /* Важливо для позиціонування 3D-сцени */
+}
+
+.hero-content {
+    text-align: center;
+    position: relative;
+    z-index: 10; /* Вміст буде над фоновою анімацією */
+    animation: float-effect 6s ease-in-out infinite;
+    animation-delay: 4s; /* Паріння теж починається після малювання */
+}
+
+/* --- Aetheria Logo Animation (Drawing Effect) --- */
+.aetheria-logo {
+    display: block;
+    width: 80vw;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.aetheria-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 100px;
+    font-weight: 700;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    
+    /* === Головні налаштування для анімації === */
+
+    /* 1. Прибираємо заливку, залишаємо тільки контур */
+    fill: transparent;
+    stroke: #A792FF; /* Колір контуру */
+    stroke-width: 1.5px; /* Товщина контуру */
+
+    /* 2. "Розбиваємо" контур на штрихи (довжина штриха = загальна довжина тексту) */
+    stroke-dasharray: 2500; /* Загальна довжина шляху (приблизна) */
+    stroke-dashoffset: 2500; /* Зміщуємо штрихи так, що контур стає невидимим */
+
+    /* 3. Запускаємо анімацію */
+    animation: draw-text 4s ease-in-out forwards;
+}
+
+/* 4. Створюємо саму анімацію */
+@keyframes draw-text {
+    to {
+        /* Повертаємо зміщення штрихів на 0, "промальовуючи" текст */
+        stroke-dashoffset: 0;
+    }
+}
+
+/* --- Book Button Styles & Animation --- */
+.btn-book {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 12px 30px;
+    border: 1.5px solid #A792FF; /* Той самий колір, що й у напису */
+    border-radius: 50px;
+    
+    color: #E0E0E0;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    
+    background-color: transparent;
+    transition: background-color 0.4s ease, color 0.4s ease;
+
+    /* --- Анімація появи --- */
+    opacity: 0; /* Початковий стан - невидима */
+    animation: fade-in-button 1.5s ease-out forwards;
+    animation-delay: 4s; /* ЗАПУСК АНІМАЦІЇ ЧЕРЕЗ 4 СЕКУНДИ */
+}
+
+.btn-book:hover {
+    background-color: #A792FF;
+    color: #0A0A14;
+}
+
+@keyframes fade-in-button {
+    to {
+        opacity: 1; /* Кінцевий стан - видима */
+    }
+}
+
+@keyframes float-effect {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px); /* Рух вгору */
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* --- Content Block Styles (Загальні для всіх блоків) --- */
+.content-block {
+    padding: 100px 40px;
+    margin: 0 auto 50px auto; /* ЗМІНЕНО: відступ знизу тепер 50px */
+    max-width: 900px;
+    
+    background-color: rgba(25, 25, 45, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    position: relative;
+    z-index: 20;
+}
+
+/* --- Стиль ТІЛЬКИ для першого контент-блоку --- */
+.site-main .content-block:first-child {
+    margin-top: 30vh; /* ЗМІНЕНО: значно менший відступ для плавності */
+}
+
+.content-container h2 {
+    font-size: 36px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+}
+
+.content-container p {
+    font-size: 18px;
+    line-height: 1.7; /* Висота рядка для комфортного читання */
+    font-weight: 300;
+    text-align: center;
+}
+
+/* --- 3D Canvas Styles --- */
+#bg-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Розміщуємо полотно за контентом (.hero-content має z-index: 10) */
+}
+
+/* --- Menu Section Styles --- */
+.menu-categories {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 40px 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.category-link {
+    font-family: 'Montserrat', sans-serif;
+    color: #E0E0E0;
+    text-decoration: none;
+    font-size: 18px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.category-link:hover {
+    opacity: 1;
+}
+
+.menu-category {
+    margin-top: 40px;
+}
+
+.menu-category h3 {
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    color: #D4B8FF; /* Світло-фіолетовий акцент */
+}
+
+.menu-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 300;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.menu-item span:first-child {
+    padding-right: 20px;
+}
