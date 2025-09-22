@@ -167,42 +167,20 @@ body {
     animation-delay: 4s; /* Паріння теж починається після малювання */
 }
 
-/* --- Aetheria Logo Animation (Drawing Effect) --- */
-.aetheria-logo {
-    display: block;
-    width: 80vw;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.aetheria-text {
+/* --- Aetheria Title Styles --- */
+.aetheria-title {
     font-family: 'Montserrat', sans-serif;
-    font-size: 100px;
+    font-size: 12vw; /* Робимо шрифт великим і адаптивним */
+    max-font-size: 140px;
     font-weight: 700;
     letter-spacing: 10px;
     text-transform: uppercase;
-    
-    /* === Головні налаштування для анімації === */
-
-    /* 1. Прибираємо заливку, залишаємо тільки контур */
-    fill: transparent;
-    stroke: #A792FF; /* Колір контуру */
-    stroke-width: 1.5px; /* Товщина контуру */
-
-    /* 2. "Розбиваємо" контур на штрихи (довжина штриха = загальна довжина тексту) */
-    stroke-dasharray: 2500; /* Загальна довжина шляху (приблизна) */
-    stroke-dashoffset: 2500; /* Зміщуємо штрихи так, що контур стає невидимим */
-
-    /* 3. Запускаємо анімацію */
-    animation: draw-text 4s ease-in-out forwards;
+    color: white;
+    margin: 0;
+    padding: 0;
 }
-
-/* 4. Створюємо саму анімацію */
-@keyframes draw-text {
-    to {
-        /* Повертаємо зміщення штрихів на 0, "промальовуючи" текст */
-        stroke-dashoffset: 0;
-    }
+.aetheria-title .char { /* GSAP створює цей клас */
+    display: inline-block;
 }
 
 /* --- Book Button Styles & Animation --- */
@@ -253,11 +231,17 @@ body {
     }
 }
 
-/* --- Content Block Styles (Загальні для всіх блоків) --- */
+/* --- Content Block Styles (FINAL CINEMATIC) --- */
 .content-block {
-    padding: 100px 40px;
-    margin: 0 auto 50px auto; /* ЗМІНЕНО: відступ знизу тепер 50px */
+    padding: 5vh 40px;
+    margin: 0; /* Прибираємо всі відступи */
     max-width: 900px;
+    width: 100%;
+    height: 100vh; /* Кожен блок займає 100% висоти екрану */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
     
     background-color: rgba(25, 25, 45, 0.4);
     backdrop-filter: blur(12px);
@@ -265,13 +249,8 @@ body {
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 
+    /* Ця властивість буде керуватися через JS */
     position: relative;
-    z-index: 20;
-}
-
-/* --- Стиль ТІЛЬКИ для першого контент-блоку --- */
-.site-main .content-block:first-child {
-    margin-top: 30vh; /* ЗМІНЕНО: значно менший відступ для плавності */
 }
 
 .content-container h2 {
@@ -334,6 +313,7 @@ body {
     color: #D4B8FF; /* Світло-фіолетовий акцент */
 }
 
+/* --- Menu Item & Hologram Modal Styles --- */
 .menu-items {
     list-style: none;
     padding: 0;
@@ -341,14 +321,269 @@ body {
 }
 
 .menu-item {
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     font-size: 18px;
     font-weight: 300;
     padding: 15px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 0.3s ease;
+}
+.menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
-.menu-item span:first-child {
-    padding-right: 20px;
+.hologram-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+.hologram-modal.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+.hologram-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+.hologram-content {
+    position: relative;
+    max-width: 800px; /* ЗБІЛЬШУЄМО МАКСИМАЛЬНУ ШИРИНУ */
+    width: 100%;
+    padding: 40px; /* Збільшуємо внутрішні відступи */
+    border-radius: 15px;
+    background: rgba(30, 30, 50, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    
+    /* === ГОТУЄМО ДО 3D-ТРАНСФОРМАЦІЇ === */
+    transform: scale(0.95) rotateX(45deg);
+    opacity: 0;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d; /* Вмикаємо 3D-простір для дочірніх елементів */
+}
+
+.hologram-modal.is-active .hologram-content {
+    transform: scale(1) rotateX(0deg);
+    opacity: 1;
+}
+
+/* Додамо також стилі для двоколонкового компонування всередині модального вікна */
+.hologram-inner-wrapper {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+.hologram-image-container, .hologram-text-container {
+    flex: 1;
+}
+.hologram-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+.hologram-close:hover {
+    opacity: 1;
+}
+.hologram-content img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+.hologram-content h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+.hologram-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: rgba(224, 224, 224, 0.9);
+}
+.hologram-content #hologram-price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #D4B8FF;
+}
+
+/* --- Contact Section Styles --- */
+.contact-wrapper {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    align-items: center;
+}
+
+.contact-info, .contact-map {
+    flex: 1; /* Кожна колонка займає 50% ширини */
+}
+
+.contact-info h3 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: #D4B8FF;
+}
+
+.contact-info p {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.contact-info a {
+    color: #E0E0E0;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.contact-info a:hover {
+    opacity: 0.8;
+}
+
+/* --- Стилізація "темної" карти --- */
+.contact-map iframe {
+    border-radius: 15px;
+    filter: invert(100%) grayscale(80%) brightness(0.8) contrast(1.2);
+}
+
+/* --- Footer Styles --- */
+.site-footer {
+    padding: 50px 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.footer-socials {
+    margin-bottom: 20px;
+}
+
+.footer-socials a {
+    color: #E0E0E0;
+    text-decoration: none;
+    margin: 0 15px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.footer-socials a:hover {
+    opacity: 1;
+}
+
+.footer-copyright {
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+/* --- Hologram Scanline Effect --- */
+.hologram-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(173, 216, 230, 0.7), transparent);
+    animation: scan-line 2s cubic-bezier(0.23, 1, 0.32, 1) 0.5s;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.hologram-modal.is-active .hologram-content::before {
+    opacity: 1;
+}
+
+@keyframes scan-line {
+    0% {
+        top: 0%;
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.7;
+    }
+    90% {
+        opacity: 0.3;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+/* === Responsive Styles for Mobile & Tablets === */
+@media (max-width: 768px) {
+
+    /* Зменшуємо розміри блоків */
+    .content-block {
+        height: auto; /* Висота по контенту */
+        min-height: auto;
+        padding: 60px 20px;
+        margin-bottom: 30px;
+    }
+
+    /* Зменшуємо шрифти */
+    .aetheria-title {
+        font-size: 50px;
+        letter-spacing: 5px;
+    }
+
+    .content-container h2 {
+        font-size: 28px;
+    }
+
+    .content-container p, .menu-item {
+        font-size: 16px;
+    }
+
+    .fullscreen-nav a {
+        font-size: 24px;
+    }
+
+    /* Виправляємо контактну секцію */
+    .contact-wrapper {
+        flex-direction: column; /* Ставимо колонки одну під одною */
+    }
+    
+    .contact-info {
+        text-align: center;
+    }
+
+    .contact-info p {
+        text-align: center;
+    }
+
+    /* Зменшуємо модальне вікно */
+    .hologram-content {
+        padding: 20px;
+        max-width: 90vw;
+    }
+    .hologram-inner-wrapper {
+        flex-direction: column;
+    }
 }

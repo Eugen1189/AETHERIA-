@@ -10,23 +10,130 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- Код для перемикачів мови ---
+    const langLinks = document.querySelectorAll('.lang-link');
+    
+    // Завантажуємо збережену мову при завантаженні сторінки
+    const savedLang = localStorage.getItem('selectedLanguage') || 'UA';
+    switchLanguage(savedLang);
+    
+    // Встановлюємо активний клас для збереженої мови
+    langLinks.forEach(link => {
+        if (link.textContent.trim() === savedLang) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+    
+    langLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Видаляємо активний клас з усіх посилань
+            langLinks.forEach(l => l.classList.remove('active'));
+            
+            // Додаємо активний клас до натиснутого посилання
+            this.classList.add('active');
+            
+            // Отримуємо вибрану мову
+            const selectedLang = this.textContent.trim();
+            
+            // Зберігаємо вибрану мову
+            localStorage.setItem('selectedLanguage', selectedLang);
+            
+            // Перемикаємо контент залежно від вибраної мови
+            switchLanguage(selectedLang);
+        });
+    });
+
+    // Функція перемикання мови
+    function switchLanguage(lang) {
+        const elementsToTranslate = {
+            'UA': {
+                'hero-title': 'AETHERIA',
+                'hero-button': 'Забронювати столик',
+                'concept-title': 'Нова ера гастрономії',
+                'concept-text': 'AETHERIA — це не просто ресторан. Це подорож за межі звичайного, де футуристичні технології зустрічаються з високою кухнею. Кожна страва — це витвір мистецтва, створений, щоб дивувати та надихати. Ми використовуємо інноваційні техніки та найсвіжіші локальні інгредієнти, щоб подарувати вам досвід, який ви не забудете.',
+                'menu-title': 'Гастрономічні сузір\'я',
+                'contact-title': 'Наші координати',
+                'footer-copyright': 'Всі права захищені.',
+                'nav-home': 'Головна',
+                'nav-menu': 'Меню',
+                'nav-concept': 'Концепція',
+                'nav-contact': 'Контакти'
+            },
+            'EN': {
+                'hero-title': 'AETHERIA',
+                'hero-button': 'Book a Table',
+                'concept-title': 'New Era of Gastronomy',
+                'concept-text': 'AETHERIA is not just a restaurant. It\'s a journey beyond the ordinary, where futuristic technologies meet haute cuisine. Every dish is a work of art, created to amaze and inspire. We use innovative techniques and the freshest local ingredients to give you an experience you will never forget.',
+                'menu-title': 'Gastronomic Constellations',
+                'contact-title': 'Our Coordinates',
+                'footer-copyright': 'All rights reserved.',
+                'nav-home': 'Home',
+                'nav-menu': 'Menu',
+                'nav-concept': 'Concept',
+                'nav-contact': 'Contact'
+            }
+        };
+
+        const translations = elementsToTranslate[lang];
+        if (!translations) return;
+
+        // Перекладаємо елементи
+        Object.keys(translations).forEach(selector => {
+            const element = document.querySelector(`[data-translate="${selector}"]`);
+            if (element) {
+                element.textContent = translations[selector];
+            }
+        });
+    }
+
     // === НОВИЙ КОД: АНІМАЦІЯ ПРОКРУТКИ З GSAP ===
 
-    // Реєструємо плагін ScrollTrigger
+    // === ФІНАЛЬНА АДАПТИВНА АНІМАЦІЯ СКРОЛУ ===
     gsap.registerPlugin(ScrollTrigger);
 
-    // === ОНОВЛЕНИЙ КОД: ПЛАВНЕ ЗНИКНЕННЯ ГОЛОВНОГО ЕКРАНУ БЕЗ ЗУПИНКИ ===
-    gsap.to('.hero-content', {
-        scrollTrigger: {
-            trigger: ".hero-scene",      // Тригер - сам головний екран
-            start: "top top",            // Починаємо анімацію, як тільки користувач починає скролити
-            end: "center top",           // Закінчуємо анімацію, коли центр екрану досягає верху
-            scrub: 1,
+    ScrollTrigger.matchMedia({
+        // --- Анімація для комп'ютерів (екран ширший за 768px) ---
+        "(min-width: 769px)": function() {
+            const sections = gsap.utils.toArray('.content-block');
+            let container = document.querySelector('.site-main');
+
+            gsap.to(sections, {
+                xPercent: -100 * (sections.length - 1),
+                ease: "none",
+                scrollTrigger: {
+                    trigger: container,
+                    pin: true,
+                    scrub: 1,
+                    snap: 1 / (sections.length - 1),
+                    end: () => "+=" + (container.offsetWidth * sections.length)
+                }
+            });
+
+            gsap.set(sections, { position: 'absolute', left: (i) => i * 100 + '%' });
+            gsap.set(container, { display: 'flex', width: (sections.length * 100) + '%' });
         },
-        opacity: 0,
-        y: -100, // Плавно зміщуємо напис вгору при зникненні
-        scale: 0.95,
-        ease: "power1.inOut"
+
+        // --- Анімація для мобільних (екран 768px і менше) ---
+        "(max-width: 768px)": function() {
+            const sections = gsap.utils.toArray('.content-block, .site-footer');
+
+            sections.forEach(section => {
+                gsap.from(section, {
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 90%",
+                        end: "top center",
+                        scrub: 1,
+                    },
+                    opacity: 0,
+                    y: 50
+                });
+            });
+        }
     });
 
     // === НОВИЙ КОД: СТВОРЕННЯ 3D-СЦЕНИ З THREE.JS ===
@@ -92,54 +199,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // === ОНОВЛЕНИЙ КОД: АНІМАЦІЯ ПЛАВНОЇ "ЕСТАФЕТИ" МІЖ БЛОКАМИ ===
 
-    // 1. Анімація ЗНИКНЕННЯ для першого блоку
-    gsap.to("#concept", {
-        scrollTrigger: {
-            trigger: "#concept",
-            start: "top center", // Анімація починається, коли ВЕРХ блоку досягає ЦЕНТРУ екрану
-            end: "bottom center",// Анімація закінчується, коли НИЗ блоку досягає ЦЕНТРУ екрану
-            scrub: 1,
-        },
-        opacity: 0,
-        scale: 0.95,
-        y: -50 // Трохи піднімаємо блок, щоб пришвидшити його вихід з екрану
-    });
-
-    // 2. Анімація ПОЯВИ для блоку меню
-    gsap.from("#menu", {
-        scrollTrigger: {
-            trigger: "#menu",
-            start: "top bottom", // Анімація починається, коли ВЕРХ блоку з'являється ВНИЗУ екрану
-            end: "top center",  // Анімація закінчується, коли ВЕРХ блоку досягає ЦЕНТРУ екрану
-            scrub: 1,
-        },
-        opacity: 0,
-        scale: 0.95,
-        y: 50 // Починаємо рух трохи нижче і піднімаємо блок на місце
-    });
-
-    // === НОВИЙ КОД: ЛОГІКА ДЛЯ МЕНЮ-АКОРДЕОНУ ===
+    // === НОВИЙ КОД: ЛОГІКА ДЛЯ ГОЛОГРАФІЧНОГО МОДАЛЬНОГО ВІКНА ===
     const menuItems = document.querySelectorAll('.menu-item');
+    const modal = document.getElementById('hologram-modal');
+    
+    if (menuItems.length > 0 && modal) {
+        const modalClose = document.getElementById('hologram-close');
+        const modalBackdrop = modal.querySelector('.hologram-backdrop');
+        const modalImage = document.getElementById('hologram-image');
+        const modalTitle = document.getElementById('hologram-title');
+        const modalDescription = document.getElementById('hologram-description');
+        const modalPrice = document.getElementById('hologram-price');
 
-    menuItems.forEach(item => {
-        const summary = item.querySelector('.menu-item-summary');
-        
-        summary.addEventListener('click', () => {
-            // Перевіряємо, чи цей пункт вже відкритий
-            const isExpanded = item.classList.contains('is-expanded');
+        const openModal = (item) => {
+            modalImage.src = item.dataset.image;
+            modalTitle.textContent = item.dataset.title;
+            modalDescription.textContent = item.dataset.description;
+            modalPrice.textContent = item.dataset.price;
+            modal.classList.add('is-active');
+        };
 
-            // Спочатку закриваємо всі відкриті пункти
-            menuItems.forEach(otherItem => {
-                otherItem.classList.remove('is-expanded');
-            });
+        const closeModal = () => {
+            modal.classList.remove('is-active');
+        };
 
-            // Якщо цей пункт був закритий, відкриваємо його
-            if (!isExpanded) {
-                item.classList.add('is-expanded');
-            }
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => openModal(item));
         });
-    });
+
+        modalClose.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
+    }
 
 }); // ЦЕ ЗАКРИВАЮЧА ДУЖКА DOMContentLoaded

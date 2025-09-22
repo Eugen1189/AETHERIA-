@@ -26,10 +26,10 @@
 <div class="fullscreen-menu" id="fullscreen-menu">
     <nav class="fullscreen-nav">
         <ul>
-            <li><a href="#">Головна</a></li>
-            <li><a href="#">Меню</a></li>
-            <li><a href="#">Концепція</a></li>
-            <li><a href="#">Контакти</a></li>
+            <li><a href="#" data-translate="nav-home">Головна</a></li>
+            <li><a href="#" data-translate="nav-menu">Меню</a></li>
+            <li><a href="#" data-translate="nav-concept">Концепція</a></li>
+            <li><a href="#" data-translate="nav-contact">Контакти</a></li>
         </ul>
     </nav>
 </div>  
