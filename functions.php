@@ -1,19 +1,23 @@
 <?php
 
 function aetheria_scripts() {
-    // Підключення CSS
+    // 1. Підключення CSS
     wp_enqueue_style( 'aetheria-style', get_stylesheet_uri() );
-    
-    // === НОВІ РЯДКИ: ПІДКЛЮЧЕННЯ GSAP ===
-    wp_enqueue_script( 'gsap-core', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js', array(), null, true );
-    wp_enqueue_script( 'gsap-scrolltrigger', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js', array('gsap-core'), null, true );
-    // ===================================
 
-    // === НОВИЙ РЯДОК: ПІДКЛЮЧЕННЯ THREE.JS ===
-    wp_enqueue_script( 'three-js', 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', array(), null, true );
+    // 2. Підключаємо ЛОКАЛЬНЕ ядро GSAP
+    wp_enqueue_script( 'gsap-core', get_template_directory_uri() . '/js/gsap.min.js', array(), null, true );
     
-    // Оновлюємо залежності для нашого main.js
-    wp_enqueue_script( 'aetheria-main-script', get_template_directory_uri() . '/js/main.js', array('gsap-core', 'gsap-scrolltrigger', 'three-js'), '1.0', true );
+    // 3. Підключаємо ЛОКАЛЬНИЙ плагін SplitText (з малої літери)
+    wp_enqueue_script( 'gsap-splittext', get_template_directory_uri() . '/js/splittext.min.js', array('gsap-core'), null, true );
+
+    // 4. Підключаємо наш основний скрипт для меню
+    wp_enqueue_script( 'aetheria-main-script', get_template_directory_uri() . '/js/main.js', array('gsap-core', 'gsap-splittext'), '1.0', true );
+
+    // 5. Підключаємо ЛОКАЛЬНУ бібліотеку Three.js
+    wp_enqueue_script( 'threejs', get_template_directory_uri() . '/js/three.min.js', array(), null, true );
+    
+    // 6. Підключаємо наш скрипт для 3D-фону
+    wp_enqueue_script( 'aetheria-hero-script', get_template_directory_uri() . '/js/three-hero.js', array('threejs'), '1.0', true );
 }
 add_action( 'wp_enqueue_scripts', 'aetheria_scripts' );
 
