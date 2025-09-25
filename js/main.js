@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- НАДІЙНА Анімація заголовку та кнопки ---
-    const title = document.querySelector('.content-overlay h1');
+    const title = document.querySelector('.hero-content h1');
     const button = document.querySelector('.cta-button');
 
     if (title && button && typeof gsap !== 'undefined') {

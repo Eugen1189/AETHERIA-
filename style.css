@@ -156,7 +156,7 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden; /* Ховаємо все, що може вийти за межі екрану */
-    position: relative; /* Важливо для позиціонування 3D-сцени */
+    position: relative; /* Важливо для позиціонування відео-фону */
 }
 
 .hero-content {
@@ -164,18 +164,9 @@ body {
     position: relative;
     z-index: 10; /* Вміст буде над фоновою анімацією */
     animation: float-effect 6s ease-in-out infinite;
-    animation-delay: 4s; /* Паріння теж починається після малювання */
+    animation-delay: 2s; /* Затримка перед початком анімації */
 }
 
-/* --- Explosion Canvas Styles --- */
-#explosion-canvas {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 100vw;
-    max-height: 100vh;
-}
 
 /* --- Premium Title --- */
 .aetheria-title {
@@ -282,14 +273,28 @@ body {
     text-align: center;
 }
 
-/* --- 3D Canvas Styles --- */
-#bg-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; /* Розміщуємо полотно за контентом (.hero-content має z-index: 10) */
+.hero-section {
+  position: relative; /* Обов'язково для позиціонування дочірніх елементів */
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Розміщує відео позаду контенту */
+}
+
+.video-background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Найважливіша властивість: масштабує відео, щоб воно покрило весь контейнер без спотворень */
 }
 
 /* --- Menu Section Styles --- */
@@ -624,8 +629,8 @@ body {
     overflow: hidden; /* Ховаємо скролбари */
 }
 
-/* --- Контейнер для 3D-сцени --- */
-#bg-canvas {
+/* --- Video Background Container --- */
+.video-background {
     position: fixed;
     top: 0;
     left: 0;
@@ -634,25 +639,27 @@ body {
     z-index: 1; /* Розміщуємо на задньому плані */
 }
 
-/* --- Контент, що буде поверх сцени --- */
-.content-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2; /* Розміщуємо над 3D-сценою */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    perspective: 1000px; /* Критично важливо для 3D-ефектів */
+.video-background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Найважливіша властивість: масштабує відео, щоб воно покрило весь контейнер без спотворень */
+}
+
+.hero-content {
+  position: relative; /* Або z-index: 1; щоб контент був поверх відео */
+  color: white;
+  text-align: center;
+  z-index: 2; /* Розміщуємо над відео */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  perspective: 1000px; /* Критично важливо для 3D-ефектів */
 }
 
 /* --- Стиль для назви ресторану --- */
-.content-overlay h1 {
+.hero-content h1 {
     font-size: clamp(4rem, 12vw, 8rem);
     font-weight: 700;
     letter-spacing: 4px;
@@ -661,8 +668,9 @@ body {
     color: transparent;
     -webkit-background-clip: text;
     background-clip: text;
-    animation: gradientAnimation 10s ease infinite; /* Прибрали fadeInH1 звідси */
+    animation: gradientAnimation 10s ease infinite;
     opacity: 0; /* Приховуємо заголовок за замовчуванням */
+    margin-bottom: 30px;
 }
 
 /* --- Стиль для кнопки --- */

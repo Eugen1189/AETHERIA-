@@ -12,21 +12,6 @@ function aetheria_scripts() {
 
     // 4. Підключаємо наш основний скрипт для меню
     wp_enqueue_script( 'aetheria-main-script', get_template_directory_uri() . '/js/main.js', array('gsap-core', 'gsap-splittext'), '1.0', true );
-
-    // 5. Підключаємо ЛОКАЛЬНУ бібліотеку Three.js
-    wp_enqueue_script( 'threejs', get_template_directory_uri() . '/js/three.min.js', array(), null, true );
-    
-    // 6. Підключаємо наш скрипт для 3D-фону
-    wp_enqueue_script( 'aetheria-hero-script', get_template_directory_uri() . '/js/three-hero.js', array('threejs'), '1.0', true );
-
-    // --- НОВИЙ БЛОК: ПЕРЕДАЄМО ДАНІ У СКРИПТ ---
-    $assets_data = array(
-        'planetMenu'     => get_template_directory_uri() . '/assets/images/planet-menu.jpg',
-        'planetAbout'    => get_template_directory_uri() . '/assets/images/planet-about.jpg',
-        'planetContacts' => get_template_directory_uri() . '/assets/images/planet-contacts.jpg',
-    );
-
-    wp_localize_script( 'aetheria-hero-script', 'AETHERIA_ASSETS', $assets_data );
 }
 add_action( 'wp_enqueue_scripts', 'aetheria_scripts' );
 
