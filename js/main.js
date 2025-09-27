@@ -1,102 +1,180 @@
+// js/main.js
+
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Код для меню ---
-    const menuToggle = document.getElementById('menu-toggle');
-    const fullscreenMenu = document.getElementById('fullscreen-menu');
-
-    if (menuToggle && fullscreenMenu) {
-        menuToggle.addEventListener('click', function() {
-            menuToggle.classList.toggle('is-active');
-            fullscreenMenu.classList.toggle('is-active');
-        });
+    // Очищуємо URL від #
+    if (window.location.hash) {
+        history.pushState("", document.title, window.location.pathname + window.location.search);
     }
-
-    // --- Код для переходу з інтро на основний контент ---
-    const enterButton = document.getElementById('enter-button');
-    const introOverlay = document.querySelector('.intro-overlay');
-    const mainContent = document.querySelector('.main-content');
-
-    const introVideoContainer = document.querySelector('.intro-video');
-    const introVideo = introVideoContainer ? introVideoContainer.querySelector('video') : null;
     
-    const mainVideoContainer = document.querySelector('.main-video');
-    const mainVideo = mainVideoContainer ? mainVideoContainer.querySelector('video') : null;
+    // Знаходимо всі елементи
+    const preloader = document.getElementById('preloader');
+    const introVideo = document.getElementById('intro-video');
+    const enterButton = document.getElementById('enter-button');
+    const planetNavContainer = document.getElementById('planet-navigation'); // Змінено назву для ясності
+    const planets = document.querySelectorAll('.planet');
+    const contentSections = document.querySelectorAll('.content-section');
+    const backButtons = document.querySelectorAll('.back-button');
+    const ctaButton = document.querySelector('.cta-button');
 
-    if (enterButton && introVideoContainer && mainVideoContainer && mainVideo) {
-        enterButton.addEventListener('click', function() {
-            // 1. Плавно ховаємо вступний екран (кнопку)
-            introOverlay.style.opacity = '0';
-
-            // 2. ЗАПУСКАЄМО АНІМАЦІЮ ЗУМУ для першого відео, додаючи клас
-            introVideoContainer.classList.add('zooming-out');
+    // Логіка для preloader'а
+    if (preloader && introVideo) {
+        introVideo.addEventListener('canplay', function() {
+            preloader.classList.add('loaded');
+        });
+    }
+    
+    // --- !!! ОСНОВНА ЗМІНА ТУТ !!! ---
+    // Логіка для кнопки "ENTER"
+    if (enterButton && preloader && planetNavContainer) {
+        enterButton.addEventListener('click', function(e) {
+            e.preventDefault();
             
-            // 3. Готуємо і показуємо друге (main) відео
-            mainVideoContainer.style.display = 'block';
-            mainVideo.play();
-            setTimeout(() => {
-                mainVideoContainer.style.opacity = '1';
-            }, 100);
+            // 1. Запускаємо анімацію зникнення preloader'а (збільшення та прозорість)
+            preloader.classList.add('hidden');
+            
+            // 2. ОДНОЧАСНО запускаємо анімацію появи планет (збільшення та видимість)
+            planetNavContainer.classList.add('visible');
+        });
+    }
 
-            // 4. Показуємо основний контент
-            mainContent.style.display = 'block';
-            setTimeout(() => {
-                mainContent.classList.add('visible');
-            }, 100);
+    // Логіка для кнопки "Резервувати шаттл"
+    if (ctaButton) {
+        ctaButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Тут можна додати логіку для бронювання
+            // Наприклад, відкрити модальне вікно або перенаправити на форму бронювання
+            alert('Функція бронювання шаттла буде додана пізніше!');
+        });
+    }
 
-            // 5. Збільшуємо час очікування до 1500мс (відповідно до тривалості анімації в CSS)
-            setTimeout(() => {
-                introOverlay.style.display = 'none';
-                introVideoContainer.style.display = 'none';
-                if (introVideo) {
-                    introVideo.pause();
+    // Логіка для планет (залишається без змін)
+    if (planets.length > 0 && planetNavContainer) {
+    planets.forEach(planet => {
+        planet.addEventListener('click', function(e) {
+                e.preventDefault();
+            const targetId = this.dataset.target;
+                const backgroundUrl = this.dataset.background;
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                    history.pushState(null, null, '#' + targetId);
+                    targetSection.style.backgroundImage = `url(${backgroundUrl})`;
+                targetSection.classList.remove('is-hidden');
+                    planetNavContainer.classList.remove('visible'); // Ховаємо, прибираючи клас visible
+            }
+        });
+    });
+    }
+
+    // Логіка для кнопок "назад" (оновлено)
+    if (backButtons.length > 0 && planetNavContainer) {
+    backButtons.forEach(button => {
+        button.addEventListener('click', function() {
+                const parentSection = this.closest('.content-section');
+                parentSection.classList.add('is-hidden');
+                history.pushState("", document.title, window.location.pathname + window.location.search);
+                setTimeout(() => { parentSection.style.backgroundImage = 'none'; }, 800);
+                planetNavContainer.classList.add('visible'); // Показуємо, додаючи клас visible
+        });
+    });
+    }
+
+    // Логіка для паралаксу (оптимізована з throttling та апаратним прискоренням)
+    if (planetNavContainer) {
+        // Функція для "проріджування" подій
+        function throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
                 }
-            }, 1500); // <-- ВАЖЛИВО: час тепер 1500ms
-        });
-    }
+            }
+        }
 
-    // --- Анімація заголовку та кнопки в основному контенті ---
-    const title = document.querySelector('.center-content h1');
-    const button = document.querySelector('.center-content .btn');
+        // Функція, яка виконує анімацію
+        function handleMouseMove(e) {
+            if (planetNavContainer.classList.contains('visible')) { // Анімація працює тільки коли планети видимі
+                const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+                const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+                const maxRotation = 10;
+                
+                // Використовуємо requestAnimationFrame для ще більшої плавності
+                window.requestAnimationFrame(function() {
+                    planetNavContainer.style.transform = `scale(1) rotateY(${x * maxRotation}deg) rotateX(${-y * maxRotation}deg)`;
+                });
+            }
+        }
 
-    if (title && button && typeof gsap !== 'undefined') {
-        // Створюємо послідовну анімацію
-        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-        // Анімуємо заголовок як єдиний елемент
-        tl.to(title, {
-            duration: 2.0,
-            opacity: 1,
-            scale: 1,
-            delay: 0.5
-        })
-        // Анімуємо кнопку
-        .to(button, {
-            duration: 1.5,
-            opacity: 1,
-            y: 0
-        }, "-=1.5");
+        // Запускаємо анімацію ТІЛЬКИ на десктопі і з "проріджуванням"
+        if (window.innerWidth > 768) {
+            document.addEventListener('mousemove', throttle(handleMouseMove, 16));
+        }
         
-    } else {
-         // Якщо GSAP не завантажився, просто показуємо елементи
-         if(title) title.style.opacity = 1;
-         if(button) button.style.opacity = 1;
-    }
-
-    // --- JavaScript для інтерактивного руху (Parallax ефект) ---
-    const planetsContainer = document.querySelector('.planets-nav');
-
-    if (planetsContainer) {
-        document.addEventListener('mousemove', function(e) {
-            // Розраховуємо позицію миші відносно центру екрану
-            // e.clientX - позиція по горизонталі, window.innerWidth - ширина екрану
-            const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-            const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-
-            // Встановлюємо максимальний кут нахилу
-            const maxRotation = 10; // в градусах
-
-            // Застосовуємо трансформацію до контейнера з планетами
-            // rotateY залежить від позиції X миші, rotateX - від позиції Y
-            planetsContainer.style.transform = `rotateY(${x * maxRotation}deg) rotateX(${-y * maxRotation}deg)`;
+        // Логіка для повернення в початкове положення при виході курсора
+        planetNavContainer.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1) rotateY(0deg) rotateX(0deg)';
         });
     }
+
+    // Логіка для кліків на заголовки категорій меню
+    const categoryTitles = document.querySelectorAll('.category-title');
+
+    categoryTitles.forEach(title => {
+        title.addEventListener('click', function() {
+            // Знаходимо контейнер з пунктами меню, який є наступним елементом
+            const itemsContainer = this.nextElementSibling;
+
+            // Перемикаємо клас 'is-open' для показу/приховування
+            if (itemsContainer) {
+                itemsContainer.classList.toggle('is-open');
+            }
+        });
+    });
+
+    // Логіка для модального вікна страв
+    const modal = document.getElementById('dish-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+    const modalPrice = document.getElementById('modal-price');
+
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // Отримуємо дані з data-атрибутів
+            const title = this.dataset.title;
+            const description = this.dataset.description;
+            const price = this.dataset.price;
+            const image = this.dataset.image;
+
+            // Заповнюємо модальне вікно
+            modalTitle.textContent = title;
+            modalDescription.textContent = description;
+            modalPrice.textContent = price;
+            modalImage.src = image;
+
+            // Показуємо модальне вікно
+            modal.classList.add('is-visible');
+        });
+    });
+
+    // Закриваємо модальне вікно при кліку на фон
+    if (modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.classList.remove('is-visible');
+            }
+        });
+    }
+
+    // Закриваємо модальне вікно клавішею Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal && modal.classList.contains('is-visible')) {
+            modal.classList.remove('is-visible');
+        }
+    });
 });

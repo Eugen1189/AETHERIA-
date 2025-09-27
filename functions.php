@@ -15,4 +15,11 @@ function aetheria_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'aetheria_scripts' );
 
+function aetheria_register_nav_menu() {
+    register_nav_menus( array(
+        'primary' => __( 'Primary Menu', 'aetheria-theme' ),
+    ) );
+}
+add_action( 'after_setup_theme', 'aetheria_register_nav_menu' );
+
 ?>
